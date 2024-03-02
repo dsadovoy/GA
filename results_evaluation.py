@@ -60,8 +60,8 @@ from  lunar_lander  import LunarLander
 # plt.title('Population fitness mean and standard deviation')
 # plt.show()
 
-save_path="C:/Users/Denis/Documents/London/New 2019/Final Project/ft/code/model/"
-ga_history = np.load("C:/Users/Denis/Documents/London/New 2019/Final Project/ft/code/model/fitness_history.npy")
+save_path="C:/Users/Denis/Documents/London/New 2019/Final Project/ft/code/model5/"
+ga_history = np.load("C:/Users/Denis/Documents/London/New 2019/Final Project/ft/code/model5/fitness_history.npy")
 fit_mean=[]
 fit_std=[]
 for el in ga_history:
@@ -91,3 +91,16 @@ plt.title('Best fitness of each generation')
 plt.xlabel('Number of generations')
 plt.ylabel('Fitness')
 plt.show()
+
+# histadapt = np.load("C:/Users/Denis/Documents/London/New 2019/Final Project/ft/code/model/adapt_history.npy")
+
+# plt.figure(figsize=(10,10))
+# plt.plot(histadapt[0])
+# plt.plot(histadapt[1])
+# plt.plot(histadapt[2])
+# plt.plot(histadapt[3])
+# plt.savefig(save_path+'/histadapt.png')
+# plt.title('Adaptation of parameters')
+# plt.xlabel('Number of generations')
+# plt.ylabel('Parameters')
+# plt.show()
