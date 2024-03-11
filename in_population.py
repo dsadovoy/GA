@@ -5,6 +5,14 @@ from tensorflow.keras import layers
 from chromosome import Chromosome
 
 class InPopulation:
+    """ 
+   A class that represents initial population.
+
+   Attributes:
+        pop_size (int): size of popuation
+   Methods:
+        generate_inpop(self): generate initial population
+    """
     def __init__(self, pop_size):     
       self.pop_size = pop_size
     
