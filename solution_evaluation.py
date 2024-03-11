@@ -1,30 +1,29 @@
-from ga import GA
-import numpy as np
-import matplotlib.pyplot as plt
-from in_population import InPopulation
 
-from selection_methods import rank_selection
-from crossover_methods import single_point_crossover
-from mutation_methods import gaussian_mutation
+import numpy as np
 from  lunar_lander  import LunarLander
 
-# ga_history = np.load("C:/Users/Denis/Documents/London/New 2019/Final Project/ft/code/model_1hl_250_el01_cr05_seed/fitness_history.npy")
-# ga_history = np.load("C:/Users/Denis/Documents/London/New 2019/Final Project/ft/code/model_1hl_225_el01_cr05tour/fitness_history.npy")
 
-# current_best=[]
+def solution_evaluation (dir, episodes_num=100):
+    """ 
+   Return scores of evaluated solution for defined number of episodes
 
-# for el in ga_history:
-#     current_best.append(el[1])
+   Parameters:
+        dir: Full path to evaluated solution
+        episodes_num: number of episodes for evaluation
+   Return:
+        List of achieved score and print average score
+    """
+    eval_solution= np.load(dir)
 
-# best_id = np.argmax(current_best)+1
-# best_solution= np.load("C:/Users/Denis/Documents/London/New 2019/Final Project/ft/code/model_1hl_225_el01_cr05tour/best_solution"+str(best_id) +".npy")
+    env = LunarLander()
+    scores = []
+    for i in range(episodes_num): 
+        scores.append(env.get_score(eval_solution))
+
+    scores_mean = np.mean(scores)
+    print ("Average score per 100 episodes: " + str(scores_mean))
+    np.save(dir + "scores", scores)
+    return scores
     
-best_solution= np.load("C:/Users/Denis/Documents/London/New 2019/Final Project/ft/code/model5/best_solution250.npy")
 
-env = LunarLander()
-scores = []
-for i in range(100): 
-    scores.append(env.get_score(best_solution))
 
-scores_mean = np.mean(scores)
-print (scores_mean)
