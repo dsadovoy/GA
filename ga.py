@@ -1,11 +1,47 @@
 import numpy as np
-import os
 import time
-# from google.colab import drive
-class GA():
+
+class GA:
+
+    """ 
+   A class that represents genetic algorithm.
+
+   Attributes:
+        population (list): list containing all solutions in population, starts with initial population
+        fitness_method (function): fitness function
+        selection_method (function): selection method
+        crossover_method (function): crossover method
+        crossover_prob (float): crossover probability
+        mutation_method (function): mutation method
+        mutation_rate (float): mutation rate
+        mutation_std (float): mutation standard deviation
+        min_crossover_prob (float): minimum crossover probability
+        min_mutation_rate (float): minimum mutation rate
+        min_mutation_std (float): minimum mutation standard deviation
+        adapt (boolean): whether genetic algorithm adaptive or not
+        adapt_crossover_prob (float): adaptive crossover probability
+        adapt_mutation_rate (float): adaptive mutation rate
+        adapt_mutation_std (float): adaptive mutation standard deviation
+        adapt_history (list): list of adaptive parameters per generation
+        pop_size (int): size of population
+        min_pop_size (int): minimum size of population
+        max_pop_size (int): maximum size of population
+        evol_rate_min (float): minimum evolutionary rate
+        gens_evol_rate (int): number of generations after which evolutionary rate is calculated
+        generations_num_max (int): maximum number of generations
+        start_time (float): start time of genetic algorithm run
+        dir (string): full path to saving location
+   Methods:
+        compute_fitness(self): compute fitness of solutions
+        generate_pop(self): generate population
+        is_evol_positive(self, value, gens_evol_rate, evol_rate_min): calculate whether evolutionary rate is positive
+        execute(self): execute run of genetic algorithm
+        save(self, dir): save results of genetic algorithm run
+    """
     def __init__(self, dir, in_population, fitness_method, selection_method, crossover_method, mutation_method, elites_percent, generations_num_max, 
                  min_pop_size = 30, max_pop_size = 60,
-                 min_crossover_prob = 0.05, min_mutation_rate = 0.05, min_mutation_std= 0.05, crossover_prob =0.5, mutation_rate=0.1, mutation_std=0.1,adapt = False):
+                 min_crossover_prob = 0.05, min_mutation_rate = 0.05, min_mutation_std= 0.05, crossover_prob =0.5, mutation_rate=0.1, mutation_std=0.1, 
+                 evol_rate_min = 0.01, gens_evol_rate = 30, adapt = False):
         self.population = in_population
         self.fitness_method = fitness_method
         self.selection_method = selection_method
@@ -25,13 +61,11 @@ class GA():
         self.pop_size = len(self.population)
         self.min_pop_size = min_pop_size
         self.max_pop_size = max_pop_size
-        self.evol_rate_min = 0.01
-        self.gens_evol_rate = 30
+        self.evol_rate_min = evol_rate_min
+        self.gens_evol_rate = gens_evol_rate
         self.generations_num_max = generations_num_max
         self.start_time = None
-        self.dir = dir
-
-      
+        self.dir = dir  
         self.fitness_history = []
         self.best_fitness = None
         self.best_solution = None
@@ -54,17 +88,16 @@ class GA():
                                   np.mean(self.fitness), np.std(self.fitness)))
 #Generating population
     def generate_pop(self):
-        # pop_size = len(self.population)
         parents_probs = self.selection_method(self.fitness)
-        # parents_probs = self.selection_method(self.fitness, max(1 - 0.02*(self.generations_num+1), 0.1))
         children = []
-#Impelementation of elitism
+#Implementation of elitism
         elites_indx = list(np.argsort(parents_probs))[-self.elites_qty:]
 
         for i in elites_indx:
             children.append(self.population[i])
         if self.adapt and self.generations_num >self.gens_evol_rate:
             is_evol_positive = self.is_evol_positive( self.fitness_history[self.generations_num -1][2],self.gens_evol_rate, self.evol_rate_min)
+#Implementation of adaptive crossover and mutation
         if self.adapt and self.generations_num >self.gens_evol_rate and is_evol_positive:
             self.adapt_crossover_prob = max (self.adapt_crossover_prob * 0.99, self.min_crossover_prob)
             self.adapt_mutation_rate = max (self.adapt_mutation_rate * 0.99, self.min_mutation_rate)
@@ -80,6 +113,7 @@ class GA():
             child = self.crossover_method(parents_mating, self.adapt_crossover_prob)
             child = self.mutation_method(child, self.adapt_mutation_rate, self.adapt_mutation_std)
             children.append(child)
+#Implementation of adaptive population size
         if self.adapt and self.generations_num >self.gens_evol_rate and  is_evol_positive and self.pop_size > self.min_pop_size:
             children.pop()
             self.pop_size-=1
@@ -90,7 +124,7 @@ class GA():
             self.adapt_history.append((self.generations_num, self.pop_size, self.adapt_crossover_prob, self.adapt_mutation_rate, self.adapt_mutation_std))
         self.population = children
 
-   
+#Calculating whether evolutionary rate is positive   
     def is_evol_positive(self, value, gens_evol_rate, evol_rate_min):
         mean_fitness_pop = []
 
@@ -102,8 +136,7 @@ class GA():
 
         
 #Executing run of GA
-    def execute(self):
-        
+    def execute(self):       
         self.start_time  = time.time()
         if self.fitness == None:
             self.compute_fitness()
@@ -122,23 +155,6 @@ class GA():
         self.save(self.dir)
 #Saving results
     def save(self, dir):
-
-        # if not os.path.exists(dir+'/model'):
-        #     os.makedirs(dir+'/model')
-        # np.save(dir+'/model/population', self.population)
-        # np.save(dir+'/model/fitness', self.fitness)
-        # np.save(dir+'/model/generation', self.generations_num)
-        # np.save(dir+'/model/fitness_history', self.fitness_history)
-        # np.save(dir+'/model/best_fitness', self.best_fitness)
-        # np.save(dir+'/model/best_solution', self.best_solution)
-        # print('Model saved')
-        # try:
-        # # Check if Google Drive is still connected
-        #     os.listdir('/content/drive')
-        # except:
-        # # If not, reconnect it
-        
-        #     drive.mount('/content/drive', force_remount=True)
         np.save(dir + 'fitness_history', self.fitness_history)
         if self.adapt:
             np.save(dir + 'adapt_history', self.adapt_history)
